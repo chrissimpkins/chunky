@@ -24,12 +24,26 @@ def get_text(url, outfile_path, chunk_size):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
                         f.flush()
-        elif r.status_code == 404:
-            pass
+            # modify requests library response object with new data
+            r.chunky_write_path = outfile_path
+            r.chunky_url = url
+            r.chunky_write_success = True
+            r.chunky_error_message = None
+            return r   # return requests library response object
         else:
-            pass
+            # modify requests library response object with new data
+            r.chunky_write_path = outfile_path
+            r.chunky_url = url
+            r.chunky_write_success = False
+            r.chunky_error_message = "GET request error.  Status code " + r.status_code
+            return r   # return requests library response object
     except Exception as e:
-        raise e
+        # modify requests library response object with new data
+        r.chunky_write_path = outfile_path
+        r.chunky_url = url
+        r.chunky_write_success = False
+        r.chunky_error_message = str(e)
+        return r   # return requests library response object
 
 
 def get_text_async(url_dict, chunk_size, concurrent_requests):

@@ -27,10 +27,17 @@ from chunky.utils.pull import get_text, get_text_async, get_binary, get_binary_a
 def get(url_dict, chunk_size=10240, response_data="text", asynchronous=True, concurrent_requests=100):
     if response_data.lower() == "text":
         if asynchronous:
-            get_text_async(url_dict, chunk_size, concurrent_requests)
+            response_futures = get_text_async(url_dict, chunk_size, concurrent_requests)
+            response_list = []
+            for r in response_futures:
+                response_list.append(r.value)  # add the requests response object to a list
+            return response_list               # return the requests response objects to caller
         else:
+            response_list = []
             for filepath, url in get_filepaths_and_urls(url_dict):
-                get_text(url, filepath, chunk_size)
+                the_response = get_text(url, filepath, chunk_size)
+                response_list.append(the_response)
+            return response_list
     elif response_data.lower() == "binary":
         if asynchronous:
             pass
