@@ -13,7 +13,7 @@ from chunky.utils.monkeypatch import monkeypatch_runner
 # -------------------------------------
 
 
-def requests_get_text(url, outfile_path, chunk_size):
+def get_text(url, outfile_path, chunk_size):
     """Pulls text files in parameter defined chunk sizes using requests library default encoding format,
         then writes the file locally to parameter defined file path"""
     try:
@@ -32,24 +32,24 @@ def requests_get_text(url, outfile_path, chunk_size):
         raise e
 
 
-def requests_get_text_async_runner(url_dict, chunk_size, concurrent_requests):
+def get_text_async(url_dict, chunk_size, concurrent_requests):
     monkeypatch_runner()
     semaphore = Semaphore(concurrent_requests)
     the_request_threads = []
     for filepath, url in get_filepaths_and_urls(url_dict):
-        request_thread = gevent.spawn(requests_get_text_async_thread_builder, url, filepath, chunk_size, semaphore)
+        request_thread = gevent.spawn(_get_text_async_thread_builder, url, filepath, chunk_size, semaphore)
         the_request_threads.append(request_thread)
 
     for the_response in gevent.iwait(the_request_threads):
         yield the_response
 
 
-def requests_get_text_async_thread_builder(url, filepath, chunk_size, semaphore):
+def _get_text_async_thread_builder(url, filepath, chunk_size, semaphore):
     with semaphore:
-        return requests_get_text(url, filepath, chunk_size)
+        return get_text(url, filepath, chunk_size)
 
 
-def requests_get_binary(url, outfile_path, chunk_size):
+def get_binary(url, outfile_path, chunk_size):
     """Pulls binary files in parameter defined chunk sizes using requests library,
         then writes the file locally to parameter defined file path"""
     try:
@@ -68,7 +68,7 @@ def requests_get_binary(url, outfile_path, chunk_size):
         raise e
 
 
-def requests_get_binary_async(url, outfile_path, chunk_size, concurrent_requests, semaphore):
+def get_binary_async(url, outfile_path, chunk_size, concurrent_requests, semaphore):
     pass
 
 
@@ -77,18 +77,18 @@ def requests_get_binary_async(url, outfile_path, chunk_size, concurrent_requests
 # ------------------------------------
 
 
-def requests_post_text(url, outfile_path):
+def post_text(url, outfile_path):
     pass
 
 
-def requests_post_text_async(url, outfile_path, semaphore):
+def post_text_async(url, outfile_path, semaphore):
     pass
 
 
-def requests_post_binary(url, outfile_path):
+def post_binary(url, outfile_path):
     pass
 
 
-def requests_post_binary_async(url, outfile_path, semaphore):
+def post_binary_async(url, outfile_path, semaphore):
     with semaphore:
         pass
