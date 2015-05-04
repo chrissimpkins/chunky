@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: chunky
+Version: 0.1.0
+Summary: Asynchronous chunked HTTP requests for large files
+Home-page: https://github.com/chrissimpkins/chunky
+Author: Christopher Simpkins
+Author-email: git.simpkins@gmail.com
+License: MIT license
+Description: UNKNOWN
+Platform: any

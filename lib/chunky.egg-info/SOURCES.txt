@@ -1,0 +1,17 @@
+MANIFEST.in
+setup.cfg
+setup.py
+docs/LICENSE
+docs/README.rst
+lib/chunky/__init__.py
+lib/chunky/libmain.py
+lib/chunky/settings.py
+lib/chunky.egg-info/PKG-INFO
+lib/chunky.egg-info/SOURCES.txt
+lib/chunky.egg-info/dependency_links.txt
+lib/chunky.egg-info/requires.txt
+lib/chunky.egg-info/top_level.txt
+lib/chunky/utils/__init__.py
+lib/chunky/utils/dictionary.py
+lib/chunky/utils/monkeypatch.py
+lib/chunky/utils/pull.py
