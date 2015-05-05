@@ -11,17 +11,34 @@
 #  |     |_ |   _   ||       || | |   ||    _  |  |   |
 #  |_______||__| |__||_______||_|  |__||___| |_|  |___|
 #
-#  Asynchronous chunked HTTP requests for files
+#  Asynchronous, concurrent, chunked HTTP requests for files
 #  Copyright 2015 Christopher Simpkins
 #  MIT license
 #
 # ------------------------------------------------------------------------------
 
 
-from chunky.utils.dictionary import get_filepaths_and_urls
+from multiprocessing import Pool
+from itertools import chain
+
+from chunky.utils.dictionary import get_filepaths_and_urls, grouper
 from chunky.utils.pull import get_text, get_text_async, get_binary, get_binary_async
 
 # PUBLIC FUNCTIONS
+
+
+def getmp(url_dict, number_processes=4):
+    chunk_number = int(round(len(url_dict) / number_processes))
+    list_of_dicts = grouper(url_dict, chunk_number)
+    pool = Pool(number_processes)
+    list_of_response_lists = pool.map(get, list_of_dicts)
+
+    response_list = []
+    for list_of_responses in list_of_response_lists:
+        for response in list_of_responses:
+            response_list.append(response)
+
+    return response_list
 
 
 def get(url_dict, chunk_size=10240, response_data="text", asynchronous=True, concurrent_requests=100):

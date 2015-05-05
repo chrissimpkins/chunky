@@ -16,8 +16,16 @@ test_dict = {'google.txt': 'http://google.com',
              'twitter.txt': 'https://twitter.com'
              }
 
+# test_dict = {'enwik1': 'https://github.com/bit-store/testfiles/releases/download/bigfiles/enwik8_1MB',
+#              'enwik2': 'https://github.com/bit-store/testfiles/releases/download/bigfiles/enwik8_2MB',
+#              'enwik5': 'https://github.com/bit-store/testfiles/releases/download/bigfiles/enwik8_5MB',
+#              'enwik10': 'https://github.com/bit-store/testfiles/releases/download/bigfiles/enwik8_10MB',
+# }
+
 start = time.time()
-chunky.get(test_dict, asynchronous=False)
+# rl = chunky.get(test_dict, asynchronous=True)
+rl = chunky.getmp(test_dict)
 end = time.time()
+print(rl)
 print ("Execution Time: " + str(end-start))
 
