@@ -19,7 +19,6 @@
 
 
 from multiprocessing import Pool
-from itertools import chain
 
 from chunky.utils.dictionary import get_filepaths_and_urls, grouper
 from chunky.utils.pull import get_text, get_text_async, get_binary, get_binary_async
@@ -33,10 +32,7 @@ def getmp(url_dict, number_processes=4):
     pool = Pool(number_processes)
     list_of_response_lists = pool.map(get, list_of_dicts)
 
-    response_list = []
-    for list_of_responses in list_of_response_lists:
-        for response in list_of_responses:
-            response_list.append(response)
+    response_list = [response for sublist in list_of_response_lists for response in sublist]   # flatten the LoL
 
     return response_list
 
