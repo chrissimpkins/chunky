@@ -24,8 +24,7 @@ def grouper(dictionary, group_size):
                 list_of_dictionaries.append(temp_dict)
         else:
             list_of_dictionaries.append(temp_dict)
-            temp_dict = {}
-            temp_dict[key] = dictionary[key]
+            temp_dict = {key: dictionary[key]}
             x = 1
             key_counter += 1
             if key_counter == dict_size:
