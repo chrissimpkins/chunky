@@ -25,6 +25,7 @@ from chunky.utils.pull import get_text, get_text_async, get_binary, get_binary_a
 
 # PUBLIC FUNCTIONS
 
+# TODO: refactor the top level function to include the parameters and logic
 
 def getmp(url_dict, number_processes=4):
     chunk_number = int(round(len(url_dict) / number_processes))
