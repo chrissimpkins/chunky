@@ -12,12 +12,13 @@ from chunky.utils.monkeypatch import monkeypatch_runner
 # GET request functions
 # -------------------------------------
 
+# Text files
 
 def get_text(url, outfile_path, chunk_size):
     """Pulls text files in parameter defined chunk sizes using requests library default encoding format,
         then writes the file locally to parameter defined file path."""
     try:
-        r = requests.get(url, stream=True)
+        r = requests.get(url, stream=True, timeout=5)
         if r.status_code == requests.codes.ok:
             with open(outfile_path, 'w') as f:
                 for chunk in r.iter_content(chunk_size=chunk_size):  # pull in chunks & write out (default = 10kb)
@@ -61,11 +62,13 @@ def _get_text_async_thread_builder(url, filepath, chunk_size, semaphore):
         return get_text(url, filepath, chunk_size)
 
 
+# Binary files
+
 def get_binary(url, outfile_path, chunk_size):
     """Pulls binary files in parameter defined chunk sizes using requests library,
         then writes the file locally to parameter defined file path"""
     try:
-        r = requests.get(url, stream=True)
+        r = requests.get(url, stream=True, timeout=5)
         if r.status_code == requests.codes.ok:
             with open(outfile_path, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=chunk_size):  # pull in chunks & write out (default = 10kb)
