@@ -41,10 +41,10 @@ def get(url_dict, response_data="text", chunk_size=10240, asynchronous=True, con
     chunk_number = int(round(len(url_dict) / number_processes))
     list_of_dicts = grouper(url_dict, chunk_number)
 
-    # create the worker process pool
+    # create the request worker process pool
     pool = Pool(number_processes)
 
-    # start workers
+    # start the request workers
     list_of_response_lists = pool.map(_get_star,
                                       itertools.izip(list_of_dicts,
                                                      itertools.repeat(response_data),
@@ -59,7 +59,7 @@ def get(url_dict, response_data="text", chunk_size=10240, asynchronous=True, con
 
 def _get_star(params):
     """Converts list of parameters to tuple of parameters for execution of the chunky.getsp() function.  Called from
-       chunky.get() function.  [PRIVATE]"""
+       chunky.get().  [PRIVATE]"""
     return getsp(*params)
 
 
@@ -80,10 +80,17 @@ def getsp(url_dict, response_data, chunk_size, asynchronous, concurrent_requests
             return response_list
     elif response_data.lower() == "binary":
         if asynchronous:
-            pass
+            response_futures = get_binary_async(url_dict, chunk_size, concurrent_requests)
+            response_list = []
+            for r in response_futures:
+                response_list.append(r.value)  # add the requests response object to a list
+            return response_list  # return the requests response objects to caller
         else:
+            response_list = []
             for filepath, url in get_filepaths_and_urls(url_dict):
-                get_binary(url, filepath, chunk_size)
+                the_response = get_binary(url, filepath, chunk_size)
+                response_list.append(the_response)
+            return response_list
 
 
 def post(url_dict, chunk_size=10240, response_data="text", asynchronous=True, concurrent_requests=100):
