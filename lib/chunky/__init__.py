@@ -17,4 +17,4 @@
 #
 # ------------------------------------------------------------------------------
 
-from libmain import get, getmp, post
+from libmain import get, getsp, post

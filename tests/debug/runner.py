@@ -24,8 +24,9 @@ test_dict = {'google.txt': 'http://google.com',
 
 start = time.time()
 # rl = chunky.get(test_dict, asynchronous=True)
-rl = chunky.getmp(test_dict)
+rl = chunky.get(test_dict, number_processes=10)
 end = time.time()
 print(rl)
 print ("Execution Time: " + str(end-start))
+
 
