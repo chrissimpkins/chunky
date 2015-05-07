@@ -35,7 +35,7 @@ def get_text(url, outfile_path, chunk_size):
             r.chunky_write_path = outfile_path
             r.chunky_url = url
             r.chunky_write_success = False
-            r.chunky_error_message = "GET request error.  Status code " + r.status_code
+            r.chunky_error_message = "GET request error.  Status code " + str(r.status_code)
             return r   # return requests library response object
     except Exception as e:
         raise e
