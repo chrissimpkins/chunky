@@ -17,6 +17,9 @@
 #
 # ------------------------------------------------------------------------------
 
+# TODO: allow calling code to set headers
+# TODO: add option to return hash digest of the downloaded file
+
 import itertools
 from multiprocessing import Pool
 

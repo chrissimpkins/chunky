@@ -13,7 +13,8 @@ test_dict = {'google.txt': 'http://google.com',
              'amazon.txt': 'http://www.amazon.com',
              'youtube.txt': 'http://www.youtube.com',
              'wiki.txt': 'http://www.wikipedia.org',
-             'twitter.txt': 'https://twitter.com'
+             'twitter.txt': 'https://twitter.com',
+             'bogus.txt': 'https://www.atotallybogussitemore.com'
              }
 
 # test_dict = {'enwik1': 'https://github.com/bit-store/testfiles/releases/download/bigfiles/enwik8_1MB',
@@ -28,5 +29,6 @@ rl = chunky.get(test_dict)
 end = time.time()
 print(rl)
 print ("Execution Time: " + str(end-start))
+
 
 

@@ -5,6 +5,7 @@ import gevent
 from gevent.lock import Semaphore
 import requests
 
+from chunky.utils.chunky_response import CResponse
 from chunky.utils.dictionary import get_filepaths_and_urls
 from chunky.utils.monkeypatch import monkeypatch_runner
 
@@ -13,6 +14,7 @@ from chunky.utils.monkeypatch import monkeypatch_runner
 # -------------------------------------
 
 # Text files
+
 
 def get_text(url, outfile_path, chunk_size):
     """Pulls text files in parameter defined chunk sizes using requests library default encoding format,
@@ -25,21 +27,21 @@ def get_text(url, outfile_path, chunk_size):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
                         f.flush()
-            # modify requests library response object with new data
-            r.chunky_write_path = outfile_path
-            r.chunky_url = url
-            r.chunky_write_success = True
-            r.chunky_error_message = None
-            return r   # return requests library response object
+            # create a new chunky response object, include requests response as an attribute
+            chunky_response = CResponse(chunky_write_path=outfile_path, chunky_url=url, chunky_write_success=True,
+                                        chunky_exception=None, chunky_error_message=None, requests_response=r)
+            return chunky_response   # return reponse object
         else:
-            # modify requests library response object with new data
-            r.chunky_write_path = outfile_path
-            r.chunky_url = url
-            r.chunky_write_success = False
-            r.chunky_error_message = "GET request error.  Status code " + str(r.status_code)
-            return r   # return requests library response object
+            # create a new chunky response object, include requests response as an attribute
+            error_message = "GET request error (Status code " + str(r.status_code) + ")"
+            chunky_response = CResponse(chunky_write_path=outfile_path, chunky_url=url, chunky_write_success=False,
+                                        chunky_exception=None, chunky_error_message=error_message, requests_response=r)
+            return chunky_response  # return reponse object
     except Exception as e:
-        raise e
+        # create a new response object, return to caller
+        chunky_response = CResponse(chunky_write_path=outfile_path, chunky_url=url, chunky_write_success=False,
+                                    chunky_exception=e, chunky_error_message=str(e), requests_response=None)
+        return chunky_response
 
 
 def get_text_async(url_dict, chunk_size, concurrent_requests):
@@ -75,21 +77,21 @@ def get_binary(url, outfile_path, chunk_size):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
                         f.flush()
-            # modify requests library response object with new data
-            r.chunky_write_path = outfile_path
-            r.chunky_url = url
-            r.chunky_write_success = True
-            r.chunky_error_message = None
-            return r   # return requests library response object
+            # create a new chunky response object, include requests response as an attribute
+            chunky_response = CResponse(chunky_write_path=outfile_path, chunky_url=url, chunky_write_success=True,
+                                        chunky_exception=None, chunky_error_message=None, requests_response=r)
+            return chunky_response  # return reponse object
         else:
-            # modify requests library response object with new data
-            r.chunky_write_path = outfile_path
-            r.chunky_url = url
-            r.chunky_write_success = False
-            r.chunky_error_message = "GET request error.  Status code " + str(r.status_code)
-            return r   # return requests library response object
+            # create a new chunky response object, include requests response as an attribute
+            error_message = "GET request error (Status code " + str(r.status_code) + ")"
+            chunky_response = CResponse(chunky_write_path=outfile_path, chunky_url=url, chunky_write_success=False,
+                                        chunky_exception=None, chunky_error_message=error_message, requests_response=r)
+            return chunky_response  # return reponse object
     except Exception as e:
-        raise e
+        # create a new response object, return to caller
+        chunky_response = CResponse(chunky_write_path=outfile_path, chunky_url=url, chunky_write_success=False,
+                                    chunky_exception=e, chunky_error_message=str(e), requests_response=None)
+        return chunky_response
 
 
 def get_binary_async(url_dict, chunk_size, concurrent_requests):
