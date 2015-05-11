@@ -17,7 +17,6 @@
 #
 # ------------------------------------------------------------------------------
 
-# TODO: allow calling code to set headers
 # TODO: add option to return hash digest of the downloaded file
 
 import itertools
@@ -29,7 +28,7 @@ from chunky.utils.pull import get_text, get_text_async, get_binary, get_binary_a
 
 
 def get(url_dict, response_data="text", chunk_size=10240, asynchronous=True, concurrent_requests=100,
-        number_processes=None):
+        number_processes=None, headers=None, generator=False):
     """Multi-process GET requests for file data and local file writes"""
     # set the number of CPU if not defined by calling code (default to 4 if cannot determine)
     if number_processes is None:
@@ -53,24 +52,29 @@ def get(url_dict, response_data="text", chunk_size=10240, asynchronous=True, con
                                                      itertools.repeat(response_data),
                                                      itertools.repeat(chunk_size),
                                                      itertools.repeat(asynchronous),
-                                                     itertools.repeat(concurrent_requests)))
+                                                     itertools.repeat(concurrent_requests),
+                                                     itertools.repeat(headers)))
 
-    response_list = [response for sublist in list_of_response_lists for response in sublist]  # flatten the LoL
+    # return as generator expression or as a complete list as per the generator flag
+    if generator is True:
+        response_list = (response for sublist in list_of_response_lists for response in sublist)  # flatten LoL to gen
+    else:
+        response_list = [response for sublist in list_of_response_lists for response in sublist]  # flatten LoL to list
 
     return response_list
 
 
 def _get_star(params):
     """Converts list of parameters to tuple of parameters for execution of the chunky.getsp() function.  Called from
-       chunky.get().  [PRIVATE]"""
+       chunky.get()."""
     return getsp(*params)
 
 
-def getsp(url_dict, response_data, chunk_size, asynchronous, concurrent_requests):
-    """Single process GET request for file data and local file write"""
+def getsp(url_dict, response_data, chunk_size, asynchronous, concurrent_requests, headers):
+    """Single process GET request for file data and local file write."""
     if response_data.lower() == "text":
         if asynchronous:
-            response_futures = get_text_async(url_dict, chunk_size, concurrent_requests)
+            response_futures = get_text_async(url_dict, chunk_size, concurrent_requests, headers)
             response_list = []
             for r in response_futures:
                 response_list.append(r.value)  # add the requests response object to a list
@@ -78,12 +82,12 @@ def getsp(url_dict, response_data, chunk_size, asynchronous, concurrent_requests
         else:
             response_list = []
             for filepath, url in get_filepaths_and_urls(url_dict):
-                the_response = get_text(url, filepath, chunk_size)
+                the_response = get_text(url, filepath, chunk_size, headers)
                 response_list.append(the_response)
             return response_list
     elif response_data.lower() == "binary":
         if asynchronous:
-            response_futures = get_binary_async(url_dict, chunk_size, concurrent_requests)
+            response_futures = get_binary_async(url_dict, chunk_size, concurrent_requests, headers)
             response_list = []
             for r in response_futures:
                 response_list.append(r.value)  # add the requests response object to a list
@@ -91,7 +95,7 @@ def getsp(url_dict, response_data, chunk_size, asynchronous, concurrent_requests
         else:
             response_list = []
             for filepath, url in get_filepaths_and_urls(url_dict):
-                the_response = get_binary(url, filepath, chunk_size)
+                the_response = get_binary(url, filepath, chunk_size, headers)
                 response_list.append(the_response)
             return response_list
 

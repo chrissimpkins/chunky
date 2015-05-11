@@ -16,11 +16,11 @@ from chunky.utils.monkeypatch import monkeypatch_runner
 # Text files
 
 
-def get_text(url, outfile_path, chunk_size):
+def get_text(url, outfile_path, chunk_size, headers):
     """Pulls text files in parameter defined chunk sizes using requests library default encoding format,
         then writes the file locally to parameter defined file path."""
     try:
-        r = requests.get(url, stream=True, timeout=5)
+        r = requests.get(url, stream=True, timeout=5, headers=headers)
         if r.status_code == requests.codes.ok:
             with open(outfile_path, 'w') as f:
                 for chunk in r.iter_content(chunk_size=chunk_size):  # pull in chunks & write out (default = 10kb)
@@ -44,33 +44,33 @@ def get_text(url, outfile_path, chunk_size):
         return chunky_response
 
 
-def get_text_async(url_dict, chunk_size, concurrent_requests):
+def get_text_async(url_dict, chunk_size, concurrent_requests, headers):
     """Asynchronous GET requests for text files"""
     monkeypatch_runner()
     semaphore = Semaphore(concurrent_requests)
     the_request_threads = []
     for filepath, url in get_filepaths_and_urls(url_dict):
-        request_thread = gevent.spawn(_get_text_async_thread_builder, url, filepath, chunk_size, semaphore)
+        request_thread = gevent.spawn(_get_text_async_thread_builder, url, filepath, chunk_size, headers, semaphore)
         the_request_threads.append(request_thread)
 
     for the_response in gevent.iwait(the_request_threads):
         yield the_response
 
 
-def _get_text_async_thread_builder(url, filepath, chunk_size, semaphore):
+def _get_text_async_thread_builder(url, filepath, chunk_size, headers, semaphore):
     """Execute the get_text() function with a semaphore that limits the number of concurrent threaded requests.
        Called from get_text_async()"""
     with semaphore:
-        return get_text(url, filepath, chunk_size)
+        return get_text(url, filepath, chunk_size, headers)
 
 
 # Binary files
 
-def get_binary(url, outfile_path, chunk_size):
+def get_binary(url, outfile_path, chunk_size, headers):
     """Pulls binary files in parameter defined chunk sizes using requests library,
         then writes the file locally to parameter defined file path"""
     try:
-        r = requests.get(url, stream=True, timeout=5)
+        r = requests.get(url, stream=True, timeout=5, headers=headers)
         if r.status_code == requests.codes.ok:
             with open(outfile_path, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=chunk_size):  # pull in chunks & write out (default = 10kb)
@@ -94,24 +94,24 @@ def get_binary(url, outfile_path, chunk_size):
         return chunky_response
 
 
-def get_binary_async(url_dict, chunk_size, concurrent_requests):
+def get_binary_async(url_dict, chunk_size, concurrent_requests, headers):
     """Asynchronous requests for binary files"""
     monkeypatch_runner()
     semaphore = Semaphore(concurrent_requests)
     the_request_threads = []
     for filepath, url in get_filepaths_and_urls(url_dict):
-        request_thread = gevent.spawn(_get_binary_async_thread_builder, url, filepath, chunk_size, semaphore)
+        request_thread = gevent.spawn(_get_binary_async_thread_builder, url, filepath, chunk_size, headers, semaphore)
         the_request_threads.append(request_thread)
 
     for the_response in gevent.iwait(the_request_threads):
         yield the_response
 
 
-def _get_binary_async_thread_builder(url, filepath, chunk_size, semaphore):
+def _get_binary_async_thread_builder(url, filepath, chunk_size, headers, semaphore):
     """Execute the get_binary() function with a semaphore that limits the number of concurrent threaded requests.
        Called from get_binary_async()"""
     with semaphore:
-        return get_binary(url, filepath, chunk_size)
+        return get_binary(url, filepath, chunk_size, headers)
 
 
 # ------------------------------------
