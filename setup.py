@@ -39,7 +39,7 @@ setup(
     platforms=['any'],
     packages=find_packages("lib"),
     package_dir={'': 'lib'},
-    install_requires=['requests', 'greenlet', 'gevent'],
+    install_requires=['requests', 'certifi', 'greenlet', 'gevent'],
     keywords='',
     include_package_data=True,
     classifiers=[],
