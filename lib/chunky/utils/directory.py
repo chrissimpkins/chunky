@@ -17,8 +17,10 @@ def confirm_dir_exists(filepath):
     if os.path.exists(dir_path):
         if os.path.isdir(dir_path):
             return True
-        else:
+        elif os.path.isfile(dir_path):
             raise OSError("The requested directory path '" + dir_path + "' is an existing file.")
+        else:
+            raise OSError("The requested directory path '" + dir_path + "' exists and is not a directory.")
     else:
         os.mkdir(dir_path)
         if os.path.isdir(dir_path):
