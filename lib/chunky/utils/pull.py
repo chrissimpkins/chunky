@@ -7,6 +7,7 @@ import requests
 
 from chunky.utils.chunky_response import CResponse
 from chunky.utils.dictionary import get_filepaths_and_urls
+from chunky.utils.directory import confirm_dir_exists
 from chunky.utils.monkeypatch import monkeypatch_runner
 
 # -------------------------------------
@@ -20,6 +21,10 @@ def get_text(url, outfile_path, chunk_size, headers):
     """Pulls text files in parameter defined chunk sizes using requests library default encoding format,
         then writes the file locally to parameter defined file path."""
     try:
+        # confirm that the directory path to the file exists, create it if it does not
+        confirm_dir_exists(outfile_path)
+
+        # pull the file
         r = requests.get(url, stream=True, timeout=5, headers=headers)
         if r.status_code == requests.codes.ok:
             with open(outfile_path, 'w') as f:
@@ -70,6 +75,10 @@ def get_binary(url, outfile_path, chunk_size, headers):
     """Pulls binary files in parameter defined chunk sizes using requests library,
         then writes the file locally to parameter defined file path"""
     try:
+        # confirm that the directory path to the file exists, create it if it does not
+        confirm_dir_exists(outfile_path)
+
+        # pull the file
         r = requests.get(url, stream=True, timeout=5, headers=headers)
         if r.status_code == requests.codes.ok:
             with open(outfile_path, 'wb') as f:
